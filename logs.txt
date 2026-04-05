@@ -1,0 +1,29 @@
+ID: 1
+Date: 2026-04-05
+Description: Created Header component and integrated it into the root layout.
+
+Changes:
+- CREATED app/components/Header.tsx
+    A new server component that renders a <header> element containing the "Flightime" brand name on the left and a basic nav link on the right. Uses Tailwind CSS for styling.
+
+- MODIFIED app/layout.tsx
+    Added import for the Header component (line 4).
+    Added <Header /> inside <body>, above the {children} slot, so the header appears on every page.
+
+ID: 2
+Date: 2026-04-05
+Description: Rewrote Header.tsx as a client component with responsive hamburger menu and sidebar.
+
+Changes:
+- MODIFIED app/components/Header.tsx
+    Converted to "use client" component. Added 5 nav links (Home, Flights, Schedule, Routes, About).
+    Desktop: horizontal nav hidden on <md. Mobile: hamburger button (SVG icon) opens a left-side drawer sidebar.
+    Logo "Flightime" shrinks from text-xl (sm+) to text-base on xs screens.
+    Sidebar includes overlay backdrop, close button (X icon), and same 5 nav links.
+3. Added radial gradient background to globals.css: black edges, dark purple (#1a0030) center, fixed attachment for static scroll behavior
+4. Updated Header.tsx: bg-black, white/gray-300 text, gray-800 borders and hover states on header, nav, hamburger, and sidebar
+5. Created public/assets/logos/.gitkeep — assets folder structure for logo images
+6. Updated app/components/Header.tsx — replaced text logo spans with next/image using Container.png, responsive h-8 sm:h-10 w-auto
+7. Fixed Header.tsx sidebar — added pointer-events-none when closed to unblock hamburger on mobile; added overflow-x-hidden to body in layout.tsx to prevent off-screen aside bleeding the X icon into view
+8. Header.tsx: sidebar now conditionally rendered (fix mobile not opening + X visible when closed); removed logo from sidebar header; close button aligned right
+9. Header.tsx: added logo back to sidebar header

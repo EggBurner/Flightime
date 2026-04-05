@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+body {
+  background-color: #000000;
+  background-image: radial-gradient(ellipse at center, #1a0030 0%, #000000 70%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100vh;
+}
+
