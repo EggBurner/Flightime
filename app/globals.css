@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+/* City dropdown scrollbar */
+.city-dropdown {
+  max-height: 180px;
+}
+
+@media (min-width: 900px) {
+  .city-dropdown {
+    max-height: 130px;
+  }
+}
+
+.city-dropdown::-webkit-scrollbar {
+  width: 3px;
+}
+.city-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.city-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.35);
+  border-radius: 99px;
+}
+.city-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.65);
+}
+
 body {
   background-color: #000000;
   background-image: radial-gradient(ellipse at center, #1a0030 0%, #000000 70%);

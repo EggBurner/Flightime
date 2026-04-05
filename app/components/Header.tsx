@@ -1,18 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 const NAV_LINKS = [
-  { label: "Home", href: "/" },
-  { label: "Flights", href: "/flights" },
-  { label: "Schedule", href: "/schedule" },
-  { label: "Routes", href: "/routes" },
-  { label: "About", href: "/about" },
+  { label: "Journey", href: "/journey" },
+  { label: "Briefing", href: "/briefing" },
+  { label: "Flight", href: "/flight" },
+  { label: "Logbook", href: "/logbook" },
+  { label: "profile", href: "/profile" },
 ];
 
 export default function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <>
@@ -31,14 +33,22 @@ export default function Header() {
           </a>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex gap-6 text-sm text-gray-300">
+          <nav className="hidden md:flex gap-6 text-sm text-gray-300 items-center">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="hover:text-white transition-colors"
+                className={`transition-colors ${pathname === link.href ? "text-purple-400" : "text-gray-300 hover:text-white"}`}
+                aria-label={link.label === "profile" ? "Profile" : undefined}
               >
-                {link.label}
+                {link.label === "profile" ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                ) : (
+                  link.label
+                )}
               </a>
             ))}
           </nav>
@@ -78,9 +88,9 @@ export default function Header() {
               <Image
                 src="/assets/logos/Container.png"
                 alt="Flightime"
-                width={160}
-                height={40}
-                className="h-8 w-auto"
+                width={110}
+                height={28}
+                className="h-6 w-auto"
               />
               <button
                 className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
@@ -102,15 +112,16 @@ export default function Header() {
                 </svg>
               </button>
             </div>
-            <nav className="flex flex-col px-4 py-4 gap-1">
+            <nav className="flex flex-col px-4 py-4 gap-3 items-center">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="py-2 px-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                  className={`py-2 px-2 rounded-md text-sm transition-colors ${pathname === link.href ? "text-purple-400" : "text-gray-300 hover:text-white hover:bg-gray-800"}`}
                   onClick={() => setSidebarOpen(false)}
+                  aria-label={link.label === "profile" ? "Profile" : undefined}
                 >
-                  {link.label}
+                  {link.label === "profile" ? "Profile" : link.label}
                 </a>
               ))}
             </nav>
