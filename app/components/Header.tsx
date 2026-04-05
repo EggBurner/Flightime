@@ -80,10 +80,10 @@ export default function Header() {
       {sidebarOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/40"
+            className="fixed inset-0 z-[9998] bg-black/40"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-black shadow-xl">
+          <aside className="fixed top-0 left-0 z-[9999] h-full w-64 bg-black shadow-xl">
             <div className="flex items-center justify-between px-4 py-4 border-b border-gray-800">
               <Image
                 src="/assets/logos/Container.png"

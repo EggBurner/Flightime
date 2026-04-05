@@ -1,11 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import CityAutocomplete from "../components/CityAutocomplete";
 
 export default function JourneyPage() {
+  const router = useRouter();
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
+  const [originCoords, setOriginCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [destCoords, setDestCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  function handleLaunch() {
+    if (!originCoords || !destCoords) return;
+    router.push(
+      `/flight?olat=${originCoords.lat}&olng=${originCoords.lng}&dlat=${destCoords.lat}&dlng=${destCoords.lng}`
+    );
+  }
 
   return (
     <main className="relative flex flex-1 min-h-[calc(100vh-57px)] items-center justify-center overflow-hidden px-4">
@@ -82,6 +93,7 @@ export default function JourneyPage() {
             placeholder="Current State of Mind"
             value={origin}
             onChange={setOrigin}
+            onSelect={(lat, lng) => setOriginCoords({ lat, lng })}
             icon={
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -100,6 +112,7 @@ export default function JourneyPage() {
             placeholder="The Flow State"
             value={destination}
             onChange={setDestination}
+            onSelect={(lat, lng) => setDestCoords({ lat, lng })}
             icon={
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -111,7 +124,9 @@ export default function JourneyPage() {
 
         {/* CTA Button */}
         <button
-          className="mt-8 w-full py-3.5 rounded-xl text-sm font-semibold text-white tracking-wide flex items-center justify-center gap-2 transition-opacity hover:opacity-90 active:opacity-80"
+          onClick={handleLaunch}
+          disabled={!originCoords || !destCoords}
+          className="mt-8 w-full py-3.5 rounded-xl text-sm font-semibold text-white tracking-wide flex items-center justify-center gap-2 transition-opacity hover:opacity-90 active:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{ background: "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)" }}
         >
           Prepare for Take-off

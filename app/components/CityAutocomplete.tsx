@@ -7,6 +7,8 @@ interface City {
   name: string;
   country: string;
   admin1?: string;
+  latitude: number;
+  longitude: number;
 }
 
 interface Props {
@@ -15,9 +17,10 @@ interface Props {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onSelect?: (lat: number, lng: number) => void;
 }
 
-export default function CityAutocomplete({ placeholder, icon, label, value, onChange }: Props) {
+export default function CityAutocomplete({ placeholder, icon, label, value, onChange, onSelect }: Props) {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<City[]>([]);
   const [open, setOpen] = useState(false);
@@ -56,6 +59,8 @@ export default function CityAutocomplete({ placeholder, icon, label, value, onCh
           name: r.name as string,
           country: r.country as string,
           admin1: r.admin1 as string | undefined,
+          latitude: r.latitude as number,
+          longitude: r.longitude as number,
         }))
         .filter((city: City) => {
           const key = `${city.name.toLowerCase()}|${city.country.toLowerCase()}`;
@@ -86,6 +91,7 @@ export default function CityAutocomplete({ placeholder, icon, label, value, onCh
     const display = `${city.name}${city.admin1 ? `, ${city.admin1}` : ""}, ${city.country}`;
     setQuery(display);
     onChange(display);
+    onSelect?.(city.latitude, city.longitude);
     setOpen(false);
     setResults([]);
   }
