@@ -27,17 +27,19 @@ Changes:
 7. Fixed Header.tsx sidebar — added pointer-events-none when closed to unblock hamburger on mobile; added overflow-x-hidden to body in layout.tsx to prevent off-screen aside bleeding the X icon into view
 8. Header.tsx: sidebar now conditionally rendered (fix mobile not opening + X visible when closed); removed logo from sidebar header; close button aligned right
 9. Header.tsx: added logo back to sidebar header
+--git push--
 ID: 10 Date: 2026-04-05 Description: Reduced sidebar logo size (width 160->110, height 40->28, class h-8->h-6) in app/components/Header.tsx to prevent overlap with close button.
-ID: 2 Date: 2026-04-05 Description: Updated NAV_LINKS in Header.tsx — renamed Home→Journey(/journey), Flights→Briefing(/briefing), Schedule→Journey(/journey), Routes→Logbook(/logbook), About→profile(/profile); replaced About text with user profile SVG icon in desktop nav and sidebar.
-ID: 3 Date: 2026-04-05 Description: Header.tsx sidebar — removed profile icon, kept 'Profile' text label; increased sidebar nav gap from gap-1 to gap-3.
-ID: 4 Date: 2026-04-05 Description: Header.tsx sidebar nav — added items-center to center nav links horizontally.
-ID: 2 Date: 2026-04-05 Description: Added usePathname to Header.tsx; active nav link turns text-purple-400 for both desktop nav and mobile sidebar.
-ID: 3 Date: 2026-04-05 Description: Created app/journey/page.tsx — placeholder page for /journey route.
-ID: 4 Date: 2026-04-05 Description: Rebuilt app/journey/page.tsx — full UI recreation: eyebrow label, heading, subtitle, origin/destination inputs with icons, connector line, purple CTA button, starburst glow deco (right), landscape card deco (left).
-ID: 5 Date: 2026-04-05 Description: app/journey/page.tsx — responsive deco positions for <900px: left card moves to bottom-left (w-32), right starburst moves to top-right (w-44/h-44).
-ID: 6 Date: 2026-04-05 Description: Created app/components/CityAutocomplete.tsx — debounced autocomplete using Open-Meteo Geocoding API (free, no key), keyboard nav, dark purple dropdown styled to theme.
-ID: 7 Date: 2026-04-05 Description: Updated app/journey/page.tsx — replaced static inputs with CityAutocomplete for origin and destination fields.
-ID: 8 Date: 2026-04-05 Description: CityAutocomplete.tsx — capped dropdown to maxHeight 180px with overflow-y-auto to prevent overflowing short screens.
-ID: 9 Date: 2026-04-05 Description: globals.css — added .city-dropdown class: 180px max-height on mobile, 130px on screens >=900px, custom 3px purple webkit scrollbar.
-ID: 10 Date: 2026-04-05 Description: CityAutocomplete.tsx — switched dropdown to .city-dropdown class, removed inline maxHeight.
-ID: 11 Date: 2026-04-05 Description: CityAutocomplete.tsx — deduplicate API results by city+country key; same city in different countries still shown.
+ID: 11 Date: 2026-04-05 Description: Updated NAV_LINKS in Header.tsx — renamed Home→Journey(/journey), Flights→Briefing(/briefing), Schedule→Journey(/journey), Routes→Logbook(/logbook), About→profile(/profile); replaced About text with user profile SVG icon in desktop nav and sidebar.
+ID: 12 Date: 2026-04-05 Description: Header.tsx sidebar — removed profile icon, kept 'Profile' text label; increased sidebar nav gap from gap-1 to gap-3.
+ID: 13 Date: 2026-04-05 Description: Header.tsx sidebar nav — added items-center to center nav links horizontally.
+ID: 14 Date: 2026-04-05 Description: Added usePathname to Header.tsx; active nav link turns text-purple-400 for both desktop nav and mobile sidebar.
+ID: 15 Date: 2026-04-05 Description: Created app/journey/page.tsx — placeholder page for /journey route.
+ID: 16 Date: 2026-04-05 Description: Rebuilt app/journey/page.tsx — full UI recreation: eyebrow label, heading, subtitle, origin/destination inputs with icons, connector line, purple CTA button, starburst glow deco (right), landscape card deco (left).
+ID: 17 Date: 2026-04-05 Description: app/journey/page.tsx — responsive deco positions for <900px: left card moves to bottom-left (w-32), right starburst moves to top-right (w-44/h-44).
+ID: 18 Date: 2026-04-05 Description: Created app/components/CityAutocomplete.tsx — debounced autocomplete using Open-Meteo Geocoding API (free, no key), keyboard nav, dark purple dropdown styled to theme.
+ID: 19 Date: 2026-04-05 Description: Updated app/journey/page.tsx — replaced static inputs with CityAutocomplete for origin and destination fields.
+ID: 20 Date: 2026-04-05 Description: CityAutocomplete.tsx — capped dropdown to maxHeight 180px with overflow-y-auto to prevent overflowing short screens.
+ID: 21 Date: 2026-04-05 Description: globals.css — added .city-dropdown class: 180px max-height on mobile, 130px on screens >=900px, custom 3px purple webkit scrollbar.
+ID: 22 Date: 2026-04-05 Description: CityAutocomplete.tsx — switched dropdown to .city-dropdown class, removed inline maxHeight.
+ID: 23 Date: 2026-04-05 Description: CityAutocomplete.tsx — deduplicate API results by city+country key; same city in different countries still shown.
+ID: 24 Date: 2026-04-05 Description: Git commit — IDs 2-11: active nav highlight, /journey route + full UI, responsive deco, CityAutocomplete with Open-Meteo API, dropdown height/scrollbar, deduplication.
