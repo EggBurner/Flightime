@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAudio } from '../providers/AudioProvider';
 import 'leaflet/dist/leaflet.css';
 
 const EARTH_RADIUS_KM = 6371;
@@ -122,14 +124,18 @@ function makePlaneIcon(L: typeof import('leaflet'), rotation: number) {
   });
 }
 
-function parseParams(): { olat: number; olng: number; dlat: number; dlng: number } | null {
+function parseParams(): { olat: number; olng: number; dlat: number; dlng: number; origin: string; destination: string } | null {
   const params = new URLSearchParams(window.location.search);
   const olat = parseFloat(params.get('olat') ?? '');
   const olng = parseFloat(params.get('olng') ?? '');
   const dlat = parseFloat(params.get('dlat') ?? '');
   const dlng = parseFloat(params.get('dlng') ?? '');
   if (isNaN(olat) || isNaN(olng) || isNaN(dlat) || isNaN(dlng)) return null;
-  return { olat, olng, dlat, dlng };
+  return {
+    olat, olng, dlat, dlng,
+    origin: params.get('origin') ?? '',
+    destination: params.get('destination') ?? '',
+  };
 }
 
 function formatTime(totalSeconds: number): string {
@@ -141,6 +147,7 @@ function formatTime(totalSeconds: number): string {
 }
 
 export default function FlightMap() {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import('leaflet').Map | null>(null);
   const planeMarkerRef = useRef<import('leaflet').Marker | null>(null);
@@ -155,14 +162,21 @@ export default function FlightMap() {
     points: [] as [number, number][],
   });
   const lastRenderedSecond = useRef(-1);
+  const saveKeyRef = useRef<string | null>(null);
 
   const [remaining, setRemaining] = useState(0);
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(() => {
+    const raw = parseFloat(localStorage.getItem('ft_speed') ?? '');
+    return SPEED_OPTIONS.includes(raw) ? raw : 1;
+  });
 
   const handleSpeedChange = (s: number) => {
     setSpeed(s);
     animStateRef.current.speed = s;
+    localStorage.setItem('ft_speed', String(s));
   };
+
+  const { cabinOn, engineOn, cabinVol, engineVol, toggleCabin, toggleEngine, setCabinVolume, setEngineVolume } = useAudio();
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -223,14 +237,30 @@ export default function FlightMap() {
 
       // Persist/restore progress across page refreshes
       const saveKey = `ft_progress_${posA[0]}_${posA[1]}_${posB[0]}_${posB[1]}`;
+
+      // Remove any stale progress from previous flights
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('ft_progress_') && k !== saveKey)
+        .forEach(k => localStorage.removeItem(k));
+
       const savedElapsed = parseFloat(localStorage.getItem(saveKey) ?? '');
       const resumeAt = (!isNaN(savedElapsed) && savedElapsed < totalSeconds) ? savedElapsed : 0;
+
+      // Publish active flight metadata so /briefing can pick up the same timer
+      saveKeyRef.current = saveKey;
+      localStorage.setItem('ft_active', JSON.stringify({
+        saveKey,
+        totalSeconds,
+        origin: coords?.origin ?? '',
+        destination: coords?.destination ?? '',
+      }));
 
       animStateRef.current.points = points;
       animStateRef.current.totalSeconds = totalSeconds;
       animStateRef.current.elapsedSeconds = resumeAt;
       animStateRef.current.lastTimestamp = 0;
       animStateRef.current.done = false;
+      animStateRef.current.speed = parseFloat(localStorage.getItem('ft_speed') ?? '') || 1;
       lastRenderedSecond.current = -1;
       setRemaining(totalSeconds - resumeAt);
 
@@ -303,6 +333,9 @@ export default function FlightMap() {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
+      // Flush current elapsed so /briefing resumes from an accurate position
+      const { elapsedSeconds, done } = animStateRef.current;
+      if (!done && saveKeyRef.current) localStorage.setItem(saveKeyRef.current, String(elapsedSeconds));
       mapRef.current?.remove();
       mapRef.current = null;
     };
@@ -409,6 +442,81 @@ export default function FlightMap() {
           letter-spacing: 0.5px;
           transition: all 0.12s ease;
         }
+        .fhud-audio-panel {
+          margin-top: 8px;
+          pointer-events: auto;
+          border-top: 1px solid rgba(168,85,247,0.12);
+          padding-top: 8px;
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+        .fhud-audio-label {
+          font-size: 10px;
+          letter-spacing: 4px;
+          color: rgba(200,180,255,0.38);
+          text-transform: uppercase;
+          font-weight: 500;
+          margin-bottom: 2px;
+        }
+        .fhud-audio-row {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+        }
+        .fhud-audio-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          transition: background 0.2s, box-shadow 0.2s;
+        }
+        .fhud-audio-dot.on {
+          background: #a855f7;
+          box-shadow: 0 0 6px #a855f7;
+        }
+        .fhud-audio-dot.off {
+          background: rgba(168,85,247,0.2);
+        }
+        .fhud-audio-name {
+          flex: 1;
+          font-size: 10px;
+          color: rgba(220,210,255,0.65);
+          font-weight: 500;
+          letter-spacing: 0.3px;
+          white-space: nowrap;
+        }
+        .fhud-audio-vol {
+          width: 52px;
+          height: 3px;
+          accent-color: #a855f7;
+          cursor: pointer;
+          opacity: 0.7;
+        }
+        .fhud-audio-vol:hover { opacity: 1; }
+        .fhud-audio-btn {
+          background: transparent;
+          border: 1px solid rgba(168,85,247,0.25);
+          border-radius: 4px;
+          color: rgba(168,85,247,0.55);
+          font-size: 9px;
+          padding: 2px 6px;
+          cursor: pointer;
+          font-family: inherit;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          transition: all 0.12s ease;
+          white-space: nowrap;
+        }
+        .fhud-audio-btn.on {
+          background: rgba(168,85,247,0.2);
+          border-color: rgba(168,85,247,0.6);
+          color: #e9d5ff;
+        }
+        .fhud-audio-btn:hover {
+          border-color: rgba(168,85,247,0.5);
+          color: #d8b4fe;
+        }
         .fhud-briefing-row {
           margin-top: 6px;
           pointer-events: auto;
@@ -476,6 +584,25 @@ export default function FlightMap() {
             padding: 3px 0;
             letter-spacing: 1.5px;
           }
+          .fhud-audio-panel {
+            margin-top: 5px;
+            padding-top: 5px;
+            gap: 3px;
+          }
+          .fhud-audio-label {
+            font-size: 7px;
+            letter-spacing: 3px;
+          }
+          .fhud-audio-name {
+            font-size: 8px;
+          }
+          .fhud-audio-btn {
+            font-size: 7px;
+            padding: 1px 4px;
+          }
+          .fhud-audio-vol {
+            width: 36px;
+          }
         }
       `}</style>
 
@@ -523,11 +650,33 @@ export default function FlightMap() {
             })}
           </div>
 
+          {/* Audio panel */}
+          <div className="fhud-audio-panel">
+            <span className="fhud-audio-label">Audio</span>
+            {([
+              { label: 'Cabin Chime',   on: cabinOn,  vol: cabinVol,  onToggle: toggleCabin,  onVolChange: setCabinVolume },
+              { label: 'Engine Sounds', on: engineOn, vol: engineVol, onToggle: toggleEngine, onVolChange: setEngineVolume },
+            ]).map(({ label, on, vol, onToggle, onVolChange }) => (
+              <div key={label} className="fhud-audio-row">
+                <span className={`fhud-audio-dot ${on ? 'on' : 'off'}`} />
+                <span className="fhud-audio-name">{label}</span>
+                <input
+                  type="range" min={0} max={1} step={0.01} value={vol}
+                  className="fhud-audio-vol"
+                  onChange={(e) => onVolChange(parseFloat(e.target.value))}
+                />
+                <button className={`fhud-audio-btn${on ? ' on' : ''}`} onClick={onToggle}>
+                  {on ? 'STOP' : 'PLAY'}
+                </button>
+              </div>
+            ))}
+          </div>
+
           {/* Briefing button row */}
           <div className="fhud-briefing-row">
             <button
               className="fhud-briefing"
-              onClick={() => { window.location.href = '/briefing'; }}
+              onClick={() => router.push('/briefing')}
             >
               Briefing
             </button>
