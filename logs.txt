@@ -67,3 +67,37 @@ ID: 44 Date: 2026-04-05 Description: FlightMap.tsx — fixed missing destination
 ID: 45 Date: 2026-04-05 Description: FlightMap.tsx — added localStorage progress persistence keyed by route coords; resumes from saved elapsed seconds on refresh, saves every 5s, clears on flight completion.
 ID: 46 Date: 2026-04-05 Description: FlightMap.tsx — disabled worldCopyJump (false) to prevent Leaflet from snapping map center by 360deg on horizontal scroll, which caused plane/route to vanish when crossing world copy boundaries.
 ID: 47 Date: 2026-04-05 Description: FlightMap.tsx — capped maxBounds longitude to [-360, 360] to limit horizontal scrolling to 2 world copies.
+ID: 35 Date: 2026-04-05 Description: FlightMap.tsx — added audio panel to HUD between speed buttons and briefing button; three tracks (Cabin Sounds, Engine Sounds, Captain's Announcement) each with play/stop toggle, volume slider, and status dot. Audio files expected at /public/audio/cabin.mp3, engine.mp3, announce.mp3.
+ID: 36 Date: 2026-04-05 Description: FlightMap.tsx — renamed Cabin Sounds to Cabin Chime; changed behavior to play once every 30 seconds via setInterval instead of looping. Interval cleared on stop or unmount.
+ID: 36 Date: 2026-04-06 Description: FlightMap.tsx — removed Captain's Announcement audio feature: deleted announceOn/announceVol state, announceAudio ref, audio initialization, cleanup call, and audio panel row.
+ID: 37 Date: 2026-04-06 Description: FlightMap.tsx — replaced engine sounds HTMLAudioElement with Web Audio API (AudioContext, AudioBufferSourceNode, GainNode) for gapless looping; added toggleEngine and setEngineVolume; updated audio panel row to use onVolChange callback.
+ID: 38 Date: 2026-04-06 Description: FlightMap.tsx — save ft_active JSON {saveKey, totalSeconds} to localStorage on flight init so /briefing can sync the timer.
+ID: 39 Date: 2026-04-06 Description: FlightMap.tsx — flush elapsedSeconds to localStorage on component unmount for accurate /briefing resume.
+ID: 40 Date: 2026-04-06 Description: Created app/hooks/useFlightTime.ts — shared hook that reads ft_active + saveKey from localStorage, ticks via wall-clock anchor, writes elapsed back every second, returns {h,m,s,remaining,elapsed,total,active}.
+ID: 41 Date: 2026-04-06 Description: Created app/briefing/page.tsx — simple black/white clock page using useFlightTime hook; back button navigates to map.
+ID: 42 Date: 2026-04-06 Description: FlightMap.tsx — added saveKeyRef to store saveKey in a ref accessible in useEffect cleanup; fixes saveKey-not-defined error on unmount flush.
+ID: 43 Date: 2026-04-06 Description: FlightMap.tsx — on flight init, remove all ft_progress_* keys except the current flight's key to prevent stale progress accumulation.
+ID: 44 Date: 2026-04-06 Description: journey/page.tsx — save ft_cities {origin, destination} to localStorage on handleLaunch so /briefing can display city names.
+ID: 45 Date: 2026-04-06 Description: hooks/useFlightTime.ts — added speed state (default 2x), setSpeed re-anchors wall-clock to prevent jump on speed change; hook now returns speed+setSpeed.
+ID: 46 Date: 2026-04-06 Description: Created app/hooks/useFlightAudio.ts — shared hook encapsulating cabin chime (HTMLAudioElement+interval) and engine (Web Audio API gapless loop) with toggleCabin/toggleEngine.
+ID: 47 Date: 2026-04-06 Description: Rebuilt app/briefing/page.tsx — dark UI matching screenshot: pill label, large Xh Xm clock, route card with origin/destination cities, speed cycle button (2/4/6/16x), cabin chime and engine toggles (purple when active), arrow+Map back button.
+ID: 48 Date: 2026-04-06 Description: Created app/providers/AudioProvider.tsx — React context holding cabin+engine audio state and Web Audio API objects at layout level for persistence across page navigations.
+ID: 49 Date: 2026-04-06 Description: Created app/providers/index.tsx — client Providers wrapper so AudioProvider can be used inside server RootLayout.
+ID: 50 Date: 2026-04-06 Description: layout.tsx — wrapped children with <Providers> so AudioProvider mounts once at app root and never unmounts on navigation.
+ID: 51 Date: 2026-04-06 Description: FlightMap.tsx — removed all inline audio state/refs/useEffect/toggle/volume functions; replaced with useAudio() from AudioProvider. Simplified audio panel row map.
+ID: 52 Date: 2026-04-06 Description: briefing/page.tsx — purple glowing clock, speed cycle updated to 2/4/8/16x, audio controls now use useAudio() from AudioProvider instead of useFlightAudio.
+ID: 53 Date: 2026-04-06 Description: Deleted app/hooks/useFlightAudio.ts — superseded by AudioProvider.
+ID: 54 Date: 2026-04-06 Description: journey/page.tsx — pass origin+destination city names as URL params instead of separate localStorage key.
+ID: 55 Date: 2026-04-06 Description: FlightMap.tsx — parseParams now returns origin+destination strings; ft_active now includes origin+destination.
+ID: 56 Date: 2026-04-06 Description: hooks/useFlightTime.ts — reads origin+destination from ft_active, exposes them in returned data.
+ID: 57 Date: 2026-04-06 Description: briefing/page.tsx — reads origin+destination from useFlightTime hook (via ft_active); removed separate ft_cities localStorage read.
+ID: 25 Date: 2026-04-06 Description: FlightMap.tsx — imported useRouter; replaced window.location.href='/briefing' with router.push('/briefing') to prevent full page reload that was stopping audio.
+ID: 26 Date: 2026-04-06 Description: AudioProvider.tsx — added visibilitychange listener to resume AudioContext when page becomes visible again after tab switch/navigation.
+ID: 25 Date: 2026-04-06 Description: briefing/page.tsx — added 1 to SPEED_CYCLE so 1× option appears in briefing speed switcher.
+ID: 26 Date: 2026-04-06 Description: hooks/useFlightTime.ts — read ft_speed from localStorage on init (useEffect), write ft_speed on setSpeed so speed persists across page navigations.
+ID: 27 Date: 2026-04-06 Description: components/FlightMap.tsx — lazy-init speed state from ft_speed localStorage; write ft_speed on handleSpeedChange; sync animStateRef.current.speed from localStorage on map init.
+ID: 25 Date: 2026-04-06 Description: briefing/page.tsx — IN-FLIGHT pill: border changed to purple (#a855f7), added glowing purple ON dot (5px circle with box-shadow) inside pill.
+ID: 26 Date: 2026-04-06 Description: briefing/page.tsx — IN-FLIGHT pill text color changed to purple (#a855f7).
+ID: 25 Date: 2026-04-06 Description: AudioProvider.tsx — lazy-create AudioContext inside toggleEngine (user gesture) instead of useEffect mount; mobile browsers suspend AudioContext created outside a gesture. Added ensureEngine() async helper to create ctx+gain+decode buffer on first tap.
+ID: 25 Date: 2026-04-06 Description: useFlightTime.ts — reset speed to 1x on new flight (savedElapsed===0) instead of reading stale ft_speed from localStorage; also writes ft_speed='1' to localStorage on new flight start.
+ID: 26 Date: 2026-04-06 Description: AudioProvider.tsx — changed audio source from /audio/engine.wav to /audio/engine.mp3.

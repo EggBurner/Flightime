@@ -14,7 +14,7 @@ export default function JourneyPage() {
   function handleLaunch() {
     if (!originCoords || !destCoords) return;
     router.push(
-      `/flight?olat=${originCoords.lat}&olng=${originCoords.lng}&dlat=${destCoords.lat}&dlng=${destCoords.lng}`
+      `/flight?olat=${originCoords.lat}&olng=${originCoords.lng}&dlat=${destCoords.lat}&dlng=${destCoords.lng}&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`
     );
   }
 
