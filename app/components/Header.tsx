@@ -5,11 +5,8 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 const NAV_LINKS = [
+  { label: "Home", href: "/" },
   { label: "Journey", href: "/journey" },
-  { label: "Briefing", href: "/briefing" },
-  { label: "Flight", href: "/flight" },
-  { label: "Logbook", href: "/logbook" },
-  { label: "profile", href: "/profile" },
 ];
 
 export default function Header() {
@@ -39,16 +36,8 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 className={`transition-colors ${pathname === link.href ? "text-purple-400" : "text-gray-300 hover:text-white"}`}
-                aria-label={link.label === "profile" ? "Profile" : undefined}
               >
-                {link.label === "profile" ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                ) : (
-                  link.label
-                )}
+                {link.label}
               </a>
             ))}
           </nav>
@@ -119,9 +108,8 @@ export default function Header() {
                   href={link.href}
                   className={`py-2 px-2 rounded-md text-sm transition-colors ${pathname === link.href ? "text-purple-400" : "text-gray-300 hover:text-white hover:bg-gray-800"}`}
                   onClick={() => setSidebarOpen(false)}
-                  aria-label={link.label === "profile" ? "Profile" : undefined}
                 >
-                  {link.label === "profile" ? "Profile" : link.label}
+                  {link.label}
                 </a>
               ))}
             </nav>
