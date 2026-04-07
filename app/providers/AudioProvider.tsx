@@ -29,6 +29,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const engineSource = useRef<AudioBufferSourceNode | null>(null);
   const engineGain = useRef<GainNode | null>(null);
   const engineReady = useRef(false);
+  const engineStarting = useRef(false);
 
   useEffect(() => {
     cabinAudio.current = new Audio('/audio/cabin.mp3');
@@ -89,11 +90,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const toggleEngine = async () => {
     if (engineOn) {
-      engineSource.current?.stop();
+      try { engineSource.current?.stop(); } catch {}
       engineSource.current = null;
       setEngineOn(false);
     } else {
+      if (engineStarting.current) return;
+      engineStarting.current = true;
       const ok = await ensureEngine();
+      engineStarting.current = false;
       if (!ok || !engineCtx.current || !engineBuffer.current) return;
 
       if (engineCtx.current.state === 'suspended') await engineCtx.current.resume();
