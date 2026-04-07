@@ -107,4 +107,4 @@ ID: 26 Date: 2026-04-07 Description: Added Home (/) nav link to NAV_LINKS in app
 ID: 27 Date: 2026-04-07 Description: Rebuilt app/page.tsx — full landing page: hero with streak bg, 3-step section, dark mode timer card section, feature cards grid (Journey Log, Atmospheric Audio, 99%/Join stats), CTA, footer.
 ID: 25 Date: 2026-04-07 Description: app/page.tsx — renamed hero button text from 'View the Map' to 'LogBook'.
 ID: 26 Date: 2026-04-07 Description: Removed /logbook and /profile from NAV_LINKS in Header.tsx; cleaned up profile-specific conditionals in desktop nav and sidebar; removed LogBook button from app/page.tsx hero section.
---git push--
+--git push--1. Fix engine audio stop bug in AudioProvider.tsx: wrap stop() in try-catch to ensure state cleanup on error; add engineStarting guard ref to prevent race condition on double-click during async load
